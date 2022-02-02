@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/mathjs/lib/browser/math.js"></script>
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        div {
+            text-align: center;
+        }
+        table {
+            border: none;
+        }
+        table div {
+            border-radius: 25px;
+            width: 50px;
+            height: 50px;
+            margin: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        table div::after {
+            content: "";
+            transition: all 0.3s ease;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+            background: red;
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            z-index: 100;
+            filter: blur(10px);
+            opacity: 0;
+        }
+
+        table div.wrong::after {
+            opacity: 1;
+        }
+
+        #ge {
+            width: 100vw;
+            height: 100vh;
+            background: #000000dd;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            transition: all 0.3s ease;
+            z-index: -1;
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+        #ge.gameover {
+            z-index: 1000;
+            opacity: 1;
+        }
+        button {
+            padding: 15px 20px;
+            border-radius: 50px;
+            background: #ffffffaa;
+            color: #fff;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2><span id="round"></span> 라운드</h2>
+        <table id="container">
+    
+        </table>
+        <h4>기회 <span id="life"></span></h4>
+    </div>
+    <div id="ge">
+        <div>
+            <h1>최종 라운드 <span id="geRound"></span></h1>
+            <button onclick="location.replace(location.href);">다시하기</button>
+        </div>
+    </div>
+    <script>
+        const container = document.getElementById("container");
+        const r = document.getElementById("round");
+        const w = document.getElementById("life");
+        
+        let round = 1;
+        let life = 5;
+
+        function setTable() {
+            r.innerHTML = round;
+            w.innerHTML = life;
+            while(container.hasChildNodes()) {
+                container.removeChild(container.firstChild);
+            }
+            const randomColor = Math.round(Math.random() * (0xffffff - 0x100000)) + 0x100000;
+            const randomValue = Math.round(Math.random() * 0xaa);
+            const randomPosition = Math.floor(Math.random() * ((Math.floor(round/10)+3)**2));
+            const randomCalculate = ['+', '-'][Math.floor(Math.random() * 2)];
+
+            let nowPosition = 0;
+
+            for(let i=0; i<Math.floor(round/10)+3; i++) {
+                const tr = document.createElement("tr");
+
+                for(let j=0; j<Math.floor(round/10)+3; j++) {
+                    const td = document.createElement("td");
+                    const div = document.createElement("div");
+
+                    if(randomPosition === nowPosition) {
+                        div.style.background = '#' + math.evaluate(`${randomColor} ${randomCalculate} ${randomValue}`).toString(16);
+                        div.dataset.target = "t";
+                    }
+                    else {
+                        div.style.background = '#' + randomColor.toString(16);
+                        div.dataset.target = "f";
+                    }
+                    div.onclick = (e) => {
+                        if(e.target.dataset.target === "t") {
+                            round++;
+                            setTable();
+                        } else {
+                            life--;
+                            e.target.classList.add("wrong");
+                            w.innerHTML = life;
+                            setTimeout(() => {e.target.classList.remove("wrong");}, 800);
+                            if(life <= 0) {
+                                gameEnd();
+                            }
+                        }
+                    }
+                    td.appendChild(div);
+                    tr.appendChild(td);
+                    nowPosition++;
+                }
+                container.appendChild(tr);
+            }
+        }
+        setTable();
+
+        function gameEnd() {
+            document.getElementById("geRound").innerHTML = round;
+            document.getElementById("ge").classList.add("gameover");
+        }
+    </script>
+</body>
+</html>
