@@ -125,7 +125,7 @@
         let gameover = false;
 
         function setTable() {
-            if(gameover === true) return;
+            if(gameover) return;
             let sec = 10;
             s.innerHTML = `${sec} 초`;
             r.innerHTML = round;
@@ -158,10 +158,18 @@
                     }
                     div.onclick = (e) => {
                         if(e.target.dataset.target === "t") {
+                            if(gameover) {
+                                gameEnd();
+                                return;
+                            }
                             clearInterval(time);
                             round++;
                             setTable();
                         } else {
+                            if(gameover) {
+                                gameEnd();
+                                return;
+                            }
                             life--;
                             e.target.classList.add("wrong");
                             w.innerHTML = life;
