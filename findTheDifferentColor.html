@@ -88,6 +88,7 @@
     
         </table>
         <h4>기회 <span id="life"></span></h4>
+        <h5 id="sec"></h5>
     </div>
     <div id="ge">
         <div>
@@ -99,11 +100,16 @@
         const container = document.getElementById("container");
         const r = document.getElementById("round");
         const w = document.getElementById("life");
+        const s = document.getElementById("sec");
+
+        let time;
         
         let round = 1;
         let life = 5;
 
         function setTable() {
+            let sec = 10;
+            s.innerHTML = `${sec} 초`;
             r.innerHTML = round;
             w.innerHTML = life;
             while(container.hasChildNodes()) {
@@ -133,6 +139,7 @@
                     }
                     div.onclick = (e) => {
                         if(e.target.dataset.target === "t") {
+                            clearInterval(time);
                             round++;
                             setTable();
                         } else {
@@ -151,12 +158,18 @@
                 }
                 container.appendChild(tr);
             }
+            time = setInterval(() => {
+                sec -= 1;
+                s.innerHTML = `${sec} 초`;
+                if(sec <= 0) gameEnd();
+            }, 1000);
         }
         setTable();
 
         function gameEnd() {
             document.getElementById("geRound").innerHTML = round;
             document.getElementById("ge").classList.add("gameover");
+            clearInterval(time);
         }
     </script>
 </body>
