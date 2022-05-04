@@ -52,8 +52,19 @@
             opacity: 1;
             background: red;
         }
+        @keyframes cor {
+            0%,60% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
         table div.correct {
-            border: 4px solid greenyellow;
+            animation: cor 2s infinite ease;
         }
 
         #ge {
