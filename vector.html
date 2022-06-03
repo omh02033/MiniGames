@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+    }
+    .line {
+      border: 2px solid black;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    let x, y;
+    let lineIdx = 0;
+    let isDown = false;
+
+    onmousedown = (e) => {
+      isDown = true;
+      function moveAt(e) {
+        if(!isDown) return;
+        console.log(e);
+        const line = document.getElementById(`line${lineIdx}`);
+        let dy = e.y-y;
+        let dx = e.x-x;
+        angle = Math.atan(dy/dx) * (180/Math.PI);
+
+        if(dx < 0.0) angle += 180;
+        else if(dy<0.0) angle += 360;
+
+        line.style.width = Math.sqrt(((e.x-x)**2) + ((e.y-y)**2)) + 'px';
+        line.style.transform = `rotate(${angle}deg)`;
+        line.style.transformOrigin = '0 0';
+      }
+      x = e.x;
+      y = e.y;
+      const line = document.createElement("div");
+      line.id = `line${lineIdx}`;
+      line.className = 'line';
+      line.style.top = `${y}px`;
+      line.style.left = `${x}px`;
+      document.body.append(line);
+      addEventListener("mousemove", moveAt);
+    }
+    onmouseup = () => {
+      isDown = false;
+      lineIdx++;
+    }
+  </script>
+</body>
+</html>
