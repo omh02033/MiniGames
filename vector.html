@@ -14,6 +14,7 @@
     .line {
       border: 2px solid black;
       position: absolute;
+      height: 0;
     }
   </style>
 </head>
@@ -27,7 +28,7 @@
       isDown = true;
       function moveAt(e) {
         if(!isDown) return;
-        console.log(e);
+
         const line = document.getElementById(`line${lineIdx}`);
         let dy = e.y-y;
         let dx = e.x-x;
@@ -36,7 +37,7 @@
         if(dx < 0.0) angle += 180;
         else if(dy<0.0) angle += 360;
 
-        line.style.width = Math.sqrt(((e.x-x)**2) + ((e.y-y)**2)) + 'px';
+        line.style.width = Math.sqrt((dx**2) + (dy**2)) + 'px';
         line.style.transform = `rotate(${angle}deg)`;
         line.style.transformOrigin = '0 0';
       }
