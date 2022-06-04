@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+    }
+    #ball {
+      width: 120px;
+      height: 120px;
+      position: absolute;
+      transform: translate(-50%, -50%);
+    }
+    #line {
+      position: absolute;
+      border: 5px dotted black;
+    }
+    .p {
+      position: absolute;
+      font-size: 2em;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      bottom: 10%;
+    }
+    .a {
+      position: absolute;
+      font-size: 2em;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      bottom: 5%;
+    }
+    #hoop {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 250px;
+      height: 250px;
+    }
+    #restart {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      top: 50%;
+      border-radius: 10px;
+      outline: none;
+      border: 0;
+      background: #00000033;
+      padding: 20px;
+      font-size: 2em;
+      cursor: pointer;
+    }
+    #goal {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 40%;
+      left: 50%;
+    }
+  </style>
+</head>
+<body>
+  <img src="./basketball.svg" alt="" id="ball">
+  <img src="./hoop.png" alt="" id="hoop">
+  <span class="p">힘 : <span id="v">0</span></span>
+  <span class="a">각 : <span id="a">0</span>˚</span>
+  <input type="button" value="다시시작" id="restart" style="display: none;" onclick="location.replace(location.href);">
+  <h1 id="goal" style="display: none;">GOAL!!</h1>
+  <script>
+    let x = window.innerWidth * 15 / 100;
+    let y = window.innerHeight * 60 / 100;
+    const hoopx = window.innerWidth * 80 / 100;
+    const hoopy = window.innerHeight * 60 / 100;
+    const ball = document.getElementById("ball");
+    const hoop = document.getElementById("hoop");
+    const restart = document.getElementById("restart");
+    const goal = document.getElementById("goal");
+    const v = document.getElementById("v");
+    const a = document.getElementById("a");
+    ball.style.left = `${x}px`;
+    ball.style.top = `${y}px`;
+    hoop.style.left = `${hoopx}px`;
+    hoop.style.top = `${hoopy}px`;
+
+    let isDown = false;
+    let angle = 0;
+    let timer;
+    let ballvx;
+    let ballvy;
+    let width;
+
+    let gameOver = false;
+    let success = false;
+
+    ball.onmousedown = (e) => {
+      if(gameOver) return;
+      isDown = true;
+      function moveAt(e) {
+        if(!isDown) return;
+
+        const line = document.getElementById("line");
+        let dy = e.y-y;
+        let dx = e.x-x;
+        angle = Math.atan(dy/dx) * (180/Math.PI);
+
+        if(dx < 0.0) angle += 180;
+        else if(dy<0.0) angle += 360;
+
+        width = Math.sqrt((dx**2) + (dy**2));
+        v.innerHTML = (width / 10).toFixed(2);
+        line.style.width = `${width}px`;
+        line.style.transform = `rotate(${(180-angle)*-1}deg)`;
+        a.innerHTML = (180-angle > 90 || 180-angle < -90 ? (180-angle)*-1 : 180-angle).toFixed(2);
+        line.style.transformOrigin = '0 0';
+      }
+      const line = document.createElement("div");
+      line.id = 'line';
+      line.className = 'line';
+      line.style.left = `${x}px`;
+      line.style.top = `${y}px`;
+      document.body.append(line);
+      addEventListener("mousemove", moveAt);
+    }
+    onmouseup = () => {
+      if(gameOver) return;
+      isDown = false;
+      const line = document.getElementById("line");
+      if(line) line.remove();
+      let velocity = (width / 10).toFixed(2);
+      var angleR = (180-angle > 90 || 180-angle < -90 ? (180-angle)*-1 : 180-angle) * Math.PI / 180;
+
+      ballvx = velocity * Math.cos(angleR);
+      ballvy = -velocity * Math.tan(angleR);
+
+      function calculate() {
+        if(gameOver) {
+          restart.style.display = "block";
+          if(success) goal.style.display = "inline-block";
+        }
+        ballvy = ballvy + 1.98;
+        x = x + ballvx;
+        y = y + ballvy;
+        ball.style.left = `${x}px`;
+        ball.style.top = `${y}px`;
+
+        if((x >= hoopx-60 && x <= hoopx+60) && (y >= hoopy-50 && y <= hoopy + 50)) {
+          success = true;
+          gameOver = true;
+        }
+
+        if(y >= window.innerHeight || y <= 0) {
+          gameOver = true;
+          restart.style.display = "block";
+          clearTimeout(timer);
+        }
+      }
+
+      timer = setInterval(calculate,1000/60);
+    }
+  </script>
+</body>
+</html>
